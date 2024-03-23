@@ -10,7 +10,7 @@ Enables ES6-like shorthand usage of Elixir maps.
 ### Why?
 
 When writing code that heavily utilizes structures and passes complex objects through multiple layers, it's common to frequently use map literals.
-This often results in repetitive code patterns such as `x = %{var1: var1, var2: var2, ...}` or `%{var1: var1, var2: var2, ...} = x`.
+This often results in repetitive code patterns such as `ctx = %{variable: variable, user: user, ...}` or `%{variable: variable, user: user, ...} = ctx`.
 
 I believe that introducing a shorthand form of object creation to Elixir enhances the language's ergonomics and is a natural extension of its existing map literals syntax.
 This feature will be immediately familiar to JavaScript and Rust developers, and similar shorthands are present in other languages such as Go.
@@ -20,29 +20,28 @@ This feature will be immediately familiar to JavaScript and Rust developers, and
 ### Creating maps
 
 ```elixir
-iex> {key1, key2, val3} = {1, 2, 3}
-iex> %{key1, key2, key3: val3}
-%{key1: 1, key2: 2, key3: 3}
+iex> {hello, foo, bar} = {"world", 1, 2}
+iex> %{hello, foo, bar: bar}
+%{hello: "world", foo: 1, bar: 2}
 ```
 
 ### Destructuring maps
 
 ```elixir
-iex> m = %{key1: 1, key2: 2, key3: 3}
-iex> %{key1, key2} = m
-iex> key1
+iex> %{hello, foo} = %{hello: "world", foo: 1, bar: 2}
+iex> hello
+"world"
+iex> foo
 1
-iex> key2
-2
 ```
 
 ### Updating maps
 
 ```elixir
-iex> m = %{key1: 1, key2: 2, key3: 3}
-iex> key2 = "new"
-iex> %{m | key2, key3: 4}
-%{key1: 1, key2: "new", key3: 4}
+iex> map = %{hello: "world", foo: 1, bar: 2}
+iex> foo = :baz
+iex> %{map | foo, bar: :bong}
+%{hello: "world", foo: :baz, bar: :bong}
 ```
 
 ### Structs
@@ -51,21 +50,21 @@ All of the above work for structs as well:
 
 ```elixir
 defmodule MyStruct do
-  defstruct [:key1, :key2, :key3]
+  defstruct [:hello, :foo, :bar]
 end
 
-iex> {key1, key2} = {:x, :y}
-iex> %MyStruct{key1, key2, key3: :z}
-%MyStruct{key1: :x, key2: :y, key3: :z}
+iex> {foo, bar} = {1, 2}
+iex> %MyStruct{foo, bar, hello: "world"}
+%MyStruct{foo: 1, bar: 2, hello: "world"}
 
-iex> m = %MyStruct{key1: :x, key2: :y}
-iex> key3 = :z
-iex> %MyStruct{m | key3}
-%MyStruct{key1: :x, key2: :y, key3: :z}
+iex> struct = %MyStruct{foo: 1, bar: 2}
+iex> hello = "world"
+iex> %MyStruct{struct | hello}
+%MyStruct{foo: 1, bar: 2, hello: "world"}
 
-iex> %MyStruct{key1} = %MyStruct{key1: :x, key2: :y}
-iex> key1
-:x
+iex> %MyStruct{hello} = %MyStruct{hello: "world", foo: 1}
+iex> hello
+"world"
 ```
 
 ## How does it work?

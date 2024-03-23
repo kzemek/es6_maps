@@ -3,7 +3,7 @@ defmodule Es6MapsTestTest do
 
   defmodule MyStruct do
     @moduledoc false
-    defstruct [:key1, :key2, :key3]
+    defstruct [:hello, :foo, :bar]
   end
 
   doctest_file("../../README.md")
