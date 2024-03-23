@@ -45,6 +45,29 @@ iex> %{m | key2, key3: 4}
 %{key1: 1, key2: "new", key3: 4}
 ```
 
+### Structs
+
+All of the above work for structs as well:
+
+```elixir
+defmodule MyStruct do
+  defstruct [:key1, :key2, :key3]
+end
+
+iex> {key1, key2} = {:x, :y}
+iex> %MyStruct{key1, key2, key3: :z}
+%MyStruct{key1: :x, key2: :y, key3: :z}
+
+iex> m = %MyStruct{key1: :x, key2: :y}
+iex> key3 = :z
+iex> %MyStruct{m | key3}
+%MyStruct{key1: :x, key2: :y, key3: :z}
+
+iex> %MyStruct{key1} = %MyStruct{key1: :x, key2: :y}
+iex> key1
+:x
+```
+
 ## How does it work?
 
 `es6_maps` uses [`meck`](https://github.com/eproxus/meck) to replace the implementation of Elixir compiler's `elixir_map` module.
