@@ -5,7 +5,7 @@ defmodule Es6Maps.MixProject do
     [
       app: :es6_maps,
       version: "0.1.0",
-      description: "Shorthand syntax for Elixir maps: `%{var1, var2} = map; IO.puts(var1)`",
+      description: "Shorthand syntax for Elixir maps: `%{foo, bar} = map; IO.puts(foo)`",
       package: [
         links: %{"GitHub" => "https://github.com/kzemek/es6_maps"},
         licenses: ["Apache-2.0"]
