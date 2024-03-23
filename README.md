@@ -1,5 +1,9 @@
 # es6_maps
 
+[![Module Version](https://img.shields.io/hexpm/v/es6_maps.svg)](https://hex.pm/packages/es6_maps)
+[![Hex Docs](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/es6_maps/)
+[![License](https://img.shields.io/hexpm/l/es6_maps.svg)](https://github.com/kzemek/es6_maps/blob/master/LICENSE)
+
 Enables ES6-like shorthand usage of Elixir maps.
 
 ### Why?
