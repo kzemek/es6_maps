@@ -5,6 +5,13 @@ defmodule Es6Maps.MixProject do
     [
       app: :es6_maps,
       version: "0.1.0",
+      description: "Shorthand syntax for Elixir maps: `%{var1, var2} = map; IO.puts(var1)`",
+      package: [
+        links: %{"GitHub" => "https://github.com/kzemek/es6_maps"},
+        licenses: ["Apache-2.0"]
+      ],
+      source_url: "https://github.com/kzemek/es6_maps",
+      docs: [main: "readme", extras: ["README.md", "LICENSE"]],
       elixir: "~> 1.16",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -18,7 +25,8 @@ defmodule Es6Maps.MixProject do
 
   defp deps do
     [
-      {:meck, "~> 0.9"}
+      {:meck, "~> 0.9"},
+      {:ex_doc, "~> 0.31", only: :dev, runtime: false}
     ]
   end
 
