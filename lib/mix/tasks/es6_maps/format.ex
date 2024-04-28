@@ -100,7 +100,7 @@ defmodule Mix.Tasks.Es6Maps.Format do
       escape: false,
       locals_without_parens: opts.locals_without_parens
     )
-    |> Inspect.Algebra.format(:infinity)
+    |> Inspect.Algebra.format(98)
     |> then(&File.write!(filepath, &1))
   end
 

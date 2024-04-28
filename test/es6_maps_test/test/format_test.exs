@@ -147,5 +147,30 @@ defmodule Es6MapsTest.Format do
         """
       end
       '''
+
+    test_formatting "comments are not moved around",
+      original: """
+      defmodule Test do
+        use LoremIpsum,
+          lorem: [LoremIpsum],
+          ipsum: [
+            # Lorem Ipsum Dolor
+            LoremIpsumDolorSitAmetConsequaturAdipisciElit,
+            LoremIpsumDolorSitAmetConsequaturAdipisciElit,
+            LoremIpsumDolorSitAmetConsequaturAdipisciElit
+          ]
+      end
+      """
+
+    test_formatting "multiline list literals are not single-lined",
+      original: """
+      def test do
+        [
+          1,
+          2,
+          3
+        ]
+      end
+      """
   end
 end
