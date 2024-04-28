@@ -25,6 +25,9 @@ jobs:
           elixir-version: ${{ env.ELIXIR_VERSION }}
           otp-version: ${{ env.ERLANG_VERSION }}
 
+      - name: Get deps
+        run: mix deps.get
+
       - name: Release to hex.pm
         run: mix hex.publish --yes
         env:
