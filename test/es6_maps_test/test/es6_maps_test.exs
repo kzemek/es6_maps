@@ -1,4 +1,4 @@
-defmodule Es6MapsTestTest do
+defmodule Es6MapsTest.Es6Maps do
   use ExUnit.Case
 
   defmodule MyStruct do

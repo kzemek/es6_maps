@@ -6,6 +6,7 @@ defmodule Es6MapsTest.MixProject do
       app: :es6_maps_test,
       version: "0.1.0",
       elixir: "~> 1.16",
+      elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:es6_maps | Mix.compilers()],
       start_permanent: Mix.env() == :prod,
       deps: deps()
@@ -20,7 +21,11 @@ defmodule Es6MapsTest.MixProject do
 
   defp deps do
     [
-      {:es6_maps, path: "../..", runtime: false}
+      {:es6_maps, path: "../..", runtime: false},
+      {:briefly, "~> 0.5.0", only: :test}
     ]
   end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 end

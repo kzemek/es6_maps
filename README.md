@@ -88,6 +88,30 @@ iex> hello
 "world"
 ```
 
+## Converting existing code to use ES6-style maps
+
+`es6_maps` includes a formatting task that will convert your existing map & struct literals into the shorthand style:
+
+```shell
+mix es6_maps.format 'lib/**/*.ex' 'test/**/*.exs'
+```
+
+The formatting task manipulates the AST, not raw strings, so it's precise and will only change your code by:
+
+1. changing map keys into the shorthand form;
+2. reordering map keys so the shorthand form comes first;
+3. formatting the results with `mix format`.
+
+See `mix help es6_maps.format` for more options and information.
+
+### Going back to old-style maps
+
+You can revert all of the ES6-style shorthand uses with the `--revert` format flag:
+
+```shell
+mix es6_maps.format --revert lib/myapp/myapp.ex
+```
+
 ## How does it work?
 
 `es6_maps` replaces in runtime the Elixir compiler's `elixir_map` module.
