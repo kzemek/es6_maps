@@ -15,6 +15,27 @@ This often results in repetitive code patterns such as `ctx = %{variable: variab
 I believe that introducing a shorthand form of object creation to Elixir enhances the language's ergonomics and is a natural extension of its existing map literals syntax.
 This feature will be immediately familiar to JavaScript and Rust developers, and similar shorthands are present in other languages such as Go.
 
+## Installation
+
+The package can be installed by adding `es6_maps` to your list of dependencies and compilers in `mix.exs`:
+
+```elixir
+def project do
+  [
+    app: :testme,
+    version: "0.1.0",
+    compilers: [:es6_maps | Mix.compilers()],
+    deps: deps()
+  ]
+end
+
+def deps do
+  [
+    {:es6_maps, "~> 0.1.0", runtime: false}
+  ]
+end
+```
+
 ## Usage
 
 ### Creating maps
@@ -69,31 +90,10 @@ iex> hello
 
 ## How does it work?
 
-`es6_maps` uses [`meck`](https://github.com/eproxus/meck) to replace the implementation of Elixir compiler's `elixir_map` module.
-The module's `expand_map/4` function is then replaced to expand map keys `%{k}` as if they were `%{k: k}`.
+`es6_maps` replaces in runtime the Elixir compiler's `elixir_map` module.
+The module's `expand_map/4` function is wrapped with a function that replaces map keys `%{k}` as if they were `%{k: k}`.
 After `es6_maps` runs as one of the Mix compilers, the Elixir compiler will use the replaced functions to compile the rest of the code.
 
 > [!IMPORTANT]
 > By the nature of this solution it's tightly coupled to the internal Elixir implementation.
 > The current version of `es6_maps` should work for Elixir 1.15, 1.16 and the upcoming 1.17 version, but may break in the future.
-
-## Installation
-
-The package can be installed by adding `es6_maps` to your list of dependencies and compilers in `mix.exs`:
-
-```elixir
-def project do
-  [
-    app: :testme,
-    version: "0.1.0",
-    compilers: [:es6_maps | Mix.compilers()],
-    deps: deps()
-  ]
-end
-
-def deps do
-  [
-    {:es6_maps, "~> 0.1.0", runtime: false}
-  ]
-end
-```

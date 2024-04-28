@@ -25,7 +25,6 @@ defmodule Es6Maps.MixProject do
 
   defp deps do
     [
-      {:meck, "~> 0.9"},
       {:ex_doc, "~> 0.31", only: :dev, runtime: false}
     ]
   end
