@@ -15,6 +15,10 @@ This often results in repetitive code patterns such as `ctx = %{variable: variab
 I believe that introducing a shorthand form of object creation to Elixir enhances the language's ergonomics and is a natural extension of its existing map literals syntax.
 This feature will be immediately familiar to JavaScript and Rust developers, and similar shorthands are present in other languages such as Go.
 
+### Is there any runtime overhead?
+
+No; the shorthand map keys compile down to exactly the same bytecode as the "old-style" maps.
+
 ## Installation
 
 The package can be installed by adding `es6_maps` to your list of dependencies and compilers in `mix.exs`:
@@ -31,7 +35,7 @@ end
 
 def deps do
   [
-    {:es6_maps, "~> 0.2.0", runtime: false}
+    {:es6_maps, "~> 0.2.1", runtime: false}
   ]
 end
 ```

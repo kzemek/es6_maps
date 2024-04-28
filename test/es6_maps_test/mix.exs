@@ -4,7 +4,7 @@ defmodule Es6MapsTest.MixProject do
   def project do
     [
       app: :es6_maps_test,
-      version: "0.2.0",
+      version: "0.2.1",
       elixir: "~> 1.16",
       elixirc_paths: elixirc_paths(Mix.env()),
       compilers: [:es6_maps | Mix.compilers()],

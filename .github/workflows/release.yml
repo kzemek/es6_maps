@@ -14,7 +14,7 @@ env:
 
 jobs:
   build:
-    name: Build and test
+    name: Release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
