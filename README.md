@@ -17,17 +17,17 @@ This feature will be immediately familiar to JavaScript and Rust developers, and
 
 ### Is there any runtime overhead?
 
-No; the shorthand map keys compile down to exactly the same bytecode as the "old-style" maps.
+No; the shorthand map keys compile down to exactly the same bytecode as the "vanilla-style" maps.
 
 ## Installation
 
 The package can be installed by adding `es6_maps` to your list of dependencies and compilers in `mix.exs`:
 
 ```elixir
+# mix.exs
+
 def project do
   [
-    app: :testme,
-    version: "0.1.0",
     compilers: [:es6_maps | Mix.compilers()],
     deps: deps()
   ]
@@ -94,38 +94,35 @@ iex> hello
 
 ## Converting existing code to use ES6-style maps
 
-`es6_maps` includes a formatting task that will convert your existing map & struct literals into the shorthand style:
-
-```shell
-mix es6_maps.format 'lib/**/*.ex' 'test/**/*.exs'
-```
-
-The formatting task manipulates the AST, not raw strings, so it's precise and will only change your code by:
-
-1. changing map keys into the shorthand form;
-2. reordering map keys so the shorthand form comes first;
-3. formatting the results with `mix format`.
-
-See `mix help es6_maps.format` for more options and information.
-
-### `mix format` plugin
-
-The formatting is also available as a `mix format` plugin.
-To automatically format your maps, simply add `Es6Maps.Formatter` to your `.formatter.exs` file:
+`es6_maps` includes a formatting plugin that will convert your existing map and struct literals into the shorthand style.
+Add the plugin to `.formatter.exs`, then call `mix format` to reformat your code:
 
 ```elixir
+# .formatter.exs
 [
   plugins: [Es6Maps.Formatter],
-  inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"],
+  inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"]
 ]
 ```
 
-### Going back to old-style maps
+The plugin manipulates the AST, not raw strings, so it's precise and will only change your code by:
 
-You can revert all of the ES6-style shorthand uses with the `--revert` format flag:
+1. changing map keys into the shorthand form;
+2. reordering map keys so the shorthand form comes first;
+3. formatting the results like `mix format` would.
 
-```shell
-mix es6_maps.format --revert lib/myapp/myapp.ex
+### Reverting to the vanilla-style maps
+
+The formatting plugin can also be used to revert all of the ES6-style map shorthand uses back to the "vanilla" style.
+Set the `map_style: :vanilla` option in `.formatter.exs`, then call `mix format` to reformat your code:
+
+```elixir
+# .formatter.exs
+[
+  plugins: [Es6Maps.Formatter],
+  inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"],
+  map_style: :vanilla
+]
 ```
 
 ## How does it work?
