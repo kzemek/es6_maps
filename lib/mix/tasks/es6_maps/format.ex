@@ -46,6 +46,8 @@ defmodule Mix.Tasks.Es6Maps.Format do
 
   use Mix.Task
 
+  alias Es6Maps.Formatter
+
   @switches [revert: :boolean, locals_without_parens: :keep]
 
   @impl Mix.Task
@@ -54,10 +56,13 @@ defmodule Mix.Tasks.Es6Maps.Format do
 
     locals_without_parens = collect_locals_without_parens(opts)
     revert = Keyword.get(opts, :revert, false)
-    opts = %{locals_without_parens: locals_without_parens, revert: revert}
+    opts = [locals_without_parens: locals_without_parens, revert: revert]
 
-    Enum.each(collect_paths(args), &format_file(&1, opts))
-    Mix.Tasks.Format.run(args)
+    args
+    |> collect_paths()
+    |> Enum.each(&format_file(&1, opts))
+
+    :ok
   end
 
   defp collect_locals_without_parens(opts) do
@@ -82,56 +87,9 @@ defmodule Mix.Tasks.Es6Maps.Format do
   end
 
   defp format_file(filepath, opts) do
-    {quoted, comments} =
-      filepath
-      |> File.read!()
-      |> Code.string_to_quoted_with_comments!(
-        emit_warnings: false,
-        literal_encoder: &{:ok, {:__block__, &2, [&1]}},
-        token_metadata: true,
-        unescape: false,
-        file: filepath
-      )
-
-    quoted
-    |> Macro.postwalk(&format_map(&1, opts))
-    |> Code.quoted_to_algebra(
-      comments: comments,
-      escape: false,
-      locals_without_parens: opts.locals_without_parens
-    )
-    |> Inspect.Algebra.format(98)
+    filepath
+    |> File.read!()
+    |> Formatter.format(opts)
     |> then(&File.write!(filepath, &1))
   end
-
-  defp format_map({:%{}, meta, [{:|, pipemeta, [lhs, elements]}]}, opts) do
-    {_, _, mapped_elements} = format_map({:%{}, pipemeta, elements}, opts)
-    {:%{}, meta, [{:|, pipemeta, [lhs, mapped_elements]}]}
-  end
-
-  defp format_map({:%{}, meta, elements}, %{revert: true}) do
-    {:%{}, meta,
-     Enum.map(elements, fn
-       {key, _meta, context} = var when is_atom(context) -> {key, var}
-       elem -> elem
-     end)}
-  end
-
-  defp format_map({:%{}, meta, elements}, _opts) do
-    {vars, key_vals} =
-      Enum.reduce(elements, {[], []}, fn
-        {{:__block__, _, [key]}, {key, _, ctx} = var}, {vars, key_vals} when is_atom(ctx) ->
-          {[var | vars], key_vals}
-
-        {_, _, ctx} = var, {vars, key_vals} when is_atom(ctx) ->
-          {[var | vars], key_vals}
-
-        key_val, {vars, key_vals} ->
-          {vars, [key_val | key_vals]}
-      end)
-
-    {:%{}, meta, Enum.reverse(key_vals ++ vars)}
-  end
-
-  defp format_map(node, _opts), do: node
 end

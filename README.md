@@ -108,6 +108,18 @@ The formatting task manipulates the AST, not raw strings, so it's precise and wi
 
 See `mix help es6_maps.format` for more options and information.
 
+### `mix format` plugin
+
+The formatting is also available as a `mix format` plugin.
+To automatically format your maps, simply add `Es6Maps.Formatter` to your `.formatter.exs` file:
+
+```elixir
+[
+  plugins: [Es6Maps.Formatter],
+  inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"],
+]
+```
+
 ### Going back to old-style maps
 
 You can revert all of the ES6-style shorthand uses with the `--revert` format flag:

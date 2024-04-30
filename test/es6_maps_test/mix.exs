@@ -21,8 +21,7 @@ defmodule Es6MapsTest.MixProject do
 
   defp deps do
     [
-      {:es6_maps, path: "../..", runtime: false},
-      {:briefly, "~> 0.5.0", only: :test}
+      {:es6_maps, path: "../..", runtime: false}
     ]
   end
 
