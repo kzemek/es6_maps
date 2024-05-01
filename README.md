@@ -17,17 +17,17 @@ This feature will be immediately familiar to JavaScript and Rust developers, and
 
 ### Is there any runtime overhead?
 
-No; the shorthand map keys compile down to exactly the same bytecode as the "old-style" maps.
+No; the shorthand map keys compile down to exactly the same bytecode as the "vanilla-style" maps.
 
 ## Installation
 
 The package can be installed by adding `es6_maps` to your list of dependencies and compilers in `mix.exs`:
 
 ```elixir
+# mix.exs
+
 def project do
   [
-    app: :testme,
-    version: "0.1.0",
     compilers: [:es6_maps | Mix.compilers()],
     deps: deps()
   ]
@@ -94,27 +94,53 @@ iex> hello
 
 ## Converting existing code to use ES6-style maps
 
-`es6_maps` includes a formatting task that will convert your existing map & struct literals into the shorthand style:
+`es6_maps` includes a formatting plugin that will convert your existing map and struct literals into the shorthand style.
+Add the plugin to `.formatter.exs`, then call `mix format` to reformat your code:
 
-```shell
-mix es6_maps.format 'lib/**/*.ex' 'test/**/*.exs'
+```elixir
+# .formatter.exs
+[
+  plugins: [Es6Maps.Formatter],
+  inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"]
+]
 ```
 
-The formatting task manipulates the AST, not raw strings, so it's precise and will only change your code by:
+The plugin manipulates the AST, not raw strings, so it's precise and will only change your code by:
 
 1. changing map keys into the shorthand form;
 2. reordering map keys so the shorthand form comes first;
-3. formatting the results with `mix format`.
+3. formatting the results like `mix format` would.
 
-See `mix help es6_maps.format` for more options and information.
+### Reverting to the vanilla-style maps
 
-### Going back to old-style maps
+The formatting plugin can also be used to revert all of the ES6-style map shorthand uses back to the "vanilla" style.
+Set the `es6_maps: [map_style: :vanilla]` option in `.formatter.exs`, then call `mix format` to reformat your code:
 
-You can revert all of the ES6-style shorthand uses with the `--revert` format flag:
-
-```shell
-mix es6_maps.format --revert lib/myapp/myapp.ex
+```elixir
+# .formatter.exs
+[
+  plugins: [Es6Maps.Formatter],
+  inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"],
+  es6_maps: [map_style: :vanilla]
+]
 ```
+
+### Formatting pragmas
+
+The plugin supports pragmas in the comments to control the formatting.
+The pragma must be in the form `# es6_maps: [map_style: :es6]` and can be placed anywhere in the file.
+The `map_style` option can be set to `:es6` to convert to shorthand form or `:vanilla` to revert to the vanilla-style maps.
+The pragma takes effect only on the line following the comment.
+
+For example in the code below, the first map will be formatted to the shorthand form, while the second map will be left as is:
+
+```elixir
+  %{foo, bar: 1} = var
+  # es6_maps: [map_style: :vanilla]
+  %{hello: hello, foo: foo, bar: 1} = var
+```
+
+`es6_maps: [map_style: :vanilla]` option in `.formatter.exs` can be combined with `# es6_maps: [map_style: :es6]` comment pragmas.
 
 ## How does it work?
 
