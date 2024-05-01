@@ -37,6 +37,56 @@ defmodule Es6MapsTest.Format do
         var
       end
       """
+
+    test_formatting "is not reformatted when inline-comment sets the map-style to :vanilla",
+      original: """
+      def test(var) do
+        %{a: a, b: b} = var
+        # es6_maps: [map_style: :vanilla]
+        %{a: a, b: b} = var
+        %{a: a, b: b} = var
+        var
+      end
+      """,
+      formatted: """
+      def test(var) do
+        %{a, b} = var
+        # es6_maps: [map_style: :vanilla]
+        %{a: a, b: b} = var
+        %{a, b} = var
+        var
+      end
+      """
+
+    test_formatting "is reformatted when inline-comment sets the map-style to :es6 but default style is :vanilla",
+      opts: [es6_maps: [map_style: :vanilla]],
+      original: """
+      def test(var) do
+        %{a: a, b: b} = var
+        # es6_maps: [map_style: :es6]
+        %{a: a, b: b} = var
+        %{a: a, b: b} = var
+        var
+      end
+      """,
+      formatted: """
+      def test(var) do
+        %{a: a, b: b} = var
+        # es6_maps: [map_style: :es6]
+        %{a, b} = var
+        %{a: a, b: b} = var
+        var
+      end
+      """,
+      reverted: """
+      def test(var) do
+        %{a: a, b: b} = var
+        # es6_maps: [map_style: :es6]
+        %{a, b} = var
+        %{a: a, b: b} = var
+        var
+      end
+      """
   end
 
   describe "map update literal" do

@@ -114,16 +114,33 @@ The plugin manipulates the AST, not raw strings, so it's precise and will only c
 ### Reverting to the vanilla-style maps
 
 The formatting plugin can also be used to revert all of the ES6-style map shorthand uses back to the "vanilla" style.
-Set the `map_style: :vanilla` option in `.formatter.exs`, then call `mix format` to reformat your code:
+Set the `es6_maps: [map_style: :vanilla]` option in `.formatter.exs`, then call `mix format` to reformat your code:
 
 ```elixir
 # .formatter.exs
 [
   plugins: [Es6Maps.Formatter],
   inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"],
-  map_style: :vanilla
+  es6_maps: [map_style: :vanilla]
 ]
 ```
+
+### Formatting pragmas
+
+The plugin supports pragmas in the comments to control the formatting.
+The pragma must be in the form `# es6_maps: [map_style: :es6]` and can be placed anywhere in the file.
+The `map_style` option can be set to `:es6` to convert to shorthand form or `:vanilla` to revert to the vanilla-style maps.
+The pragma takes effect only on the line following the comment.
+
+For example in the code below, the first map will be formatted to the shorthand form, while the second map will be left as is:
+
+```elixir
+  %{foo, bar: 1} = var
+  # es6_maps: [map_style: :vanilla]
+  %{hello: hello, foo: foo, bar: 1} = var
+```
+
+`es6_maps: [map_style: :vanilla]` option in `.formatter.exs` can be combined with `# es6_maps: [map_style: :es6]` comment pragmas.
 
 ## How does it work?
 
