@@ -1,9 +1,24 @@
-defmodule Mix.Tasks.Compile.Es6Maps do
-  @moduledoc false
+defmodule Es6Maps do
+  use Application
 
-  use Mix.Task.Compiler
+  def start(_type, _args) do
+    load()
+    Supervisor.start_link([], name: __MODULE__, strategy: :one_for_one)
+  end
 
-  def run(_args) do
+  def load do
+    if not injected?(), do: inject_es6_maps_support()
+    :ok
+  end
+
+  defp injected? do
+    Code.with_diagnostics(fn -> Code.compile_string("%{x} = %{x: 1}") end)
+    true
+  rescue
+    CompileError -> false
+  end
+
+  defp inject_es6_maps_support do
     {:elixir, elixir_bytecode, elixir_filename} = :code.get_object_code(:elixir)
     elixir_forms = abstract_code(elixir_bytecode)
     compile_opts = compile_opts(elixir_bytecode)
@@ -24,8 +39,6 @@ defmodule Mix.Tasks.Compile.Es6Maps do
       :compile.forms(forms, [:return_errors, :return_warnings | compile_opts])
 
     {:module, :elixir} = :code.load_binary(:elixir, elixir_filename, binary)
-
-    :ok
   end
 
   defp function?({:function, _, name, arity, _}, names), do: {name, arity} in names

@@ -20,7 +20,7 @@ defmodule Es6Maps.MixProject do
   end
 
   def application do
-    []
+    [mod: {Es6Maps, []}]
   end
 
   defp deps do
