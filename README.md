@@ -144,10 +144,11 @@ For example in the code below, the first map will be formatted to the shorthand 
 
 ## How does it work?
 
-`es6_maps` replaces in runtime the Elixir compiler's `elixir_map` module.
-The module's `expand_map/4` function is wrapped with a function that replaces map keys `%{k}` as if they were `%{k: k}`.
+`es6_maps` replaces in runtime the Elixir compiler's `:elixir` module.
+The module's `string_to_tokens/5` function is wrapped with a function that replaces map keys `%{k}` as if they were `%{k: k}`.
 After `es6_maps` runs as one of the Mix compilers, the Elixir compiler will use the replaced functions to compile the rest of the code.
 
 > [!IMPORTANT]
+>
 > By the nature of this solution it's tightly coupled to the internal Elixir implementation.
-> The current version of `es6_maps` should work for Elixir 1.15, 1.16, 1.17 and the upcoming 1.18 version, but may break in the future.
+> The current version of `es6_maps` should work for Elixir 1.15, 1.16, 1.17, 1.18 and the upcoming 1.19 version, but may break in the future.
