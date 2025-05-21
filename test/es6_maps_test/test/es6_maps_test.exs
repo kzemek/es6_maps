@@ -56,12 +56,76 @@ defmodule Es6MapsTest.Es6Maps do
                {:"}", _}
              ] = tokens
     end
+
+    test "map expand in binary" do
+      assert {:ok, tokens} = :elixir.string_to_tokens(~C'"#{%{x}}"', 0, 0, "", [])
+
+      assert [
+               {:bin_string, _,
+                [
+                  {_, _,
+                   [
+                     {:%{}, _},
+                     {:"{", _},
+                     {:kw_identifier, _, :x},
+                     {:identifier, _, :x},
+                     {:"}", _}
+                   ]}
+                ]}
+             ] = tokens
+    end
+
+    test "map expand in heredoc" do
+      code = ~C'''
+      """
+      #{%{x}}
+      """
+      '''
+
+      assert {:ok, tokens} = :elixir.string_to_tokens(code, 0, 0, "", [])
+
+      assert [
+               {:bin_heredoc, _, _,
+                [
+                  _,
+                  {_, _,
+                   [
+                     {:%{}, _},
+                     {:"{", _},
+                     {:kw_identifier, _, :x},
+                     {:identifier, _, :x},
+                     {:"}", _}
+                   ]},
+                  _
+                ]},
+               {:eol, _}
+             ] = tokens
+    end
+
+    test "map expand in sigil" do
+      assert {:ok, tokens} =
+               :elixir.string_to_tokens(~C"~w[#{%{x}}]", 0, 0, "", [])
+
+      assert [
+               {:sigil, _, _,
+                [
+                  {_, _,
+                   [
+                     {:%{}, _},
+                     {:"{", _},
+                     {:kw_identifier, _, :x},
+                     {:identifier, _, :x},
+                     {:"}", _}
+                   ]}
+                ], _, _, _}
+             ] = tokens
+    end
   end
 
   describe "ExUnit assertions" do
     test "assert structs" do
       foo = 1
-      assert %MyStruct{hello, foo: 2} = %MyStruct{foo, bar: 3}
+      assert %MyStruct{hello: hello, foo: 2} = %MyStruct{foo: foo, bar: 3}
       _ = hello
     rescue
       e in ExUnit.AssertionError ->
@@ -73,7 +137,7 @@ defmodule Es6MapsTest.Es6Maps do
 
     test "assert maps" do
       foo = 1
-      assert %{hello, foo: 2} = %{foo, bar: 3}
+      assert %{hello: hello, foo: 2} = %{foo: foo, bar: 3}
       _ = hello
     rescue
       e in ExUnit.AssertionError ->

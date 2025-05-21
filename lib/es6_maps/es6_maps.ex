@@ -74,46 +74,50 @@ defmodule Es6Maps do
         end
 
         defp es6_maps_expand_identifiers(tokens, quoted) do
-          # A map of {line, column} -> [tokens]
-          mapped_tokens =
-            Enum.group_by(tokens, fn token ->
-              meta = elem(token, 1)
-              line = elem(meta, 0)
-              column = elem(meta, 1)
-              {line, column}
+          {_, idents_to_expand} =
+            Macro.prewalk(quoted, MapSet.new(), fn
+              {:%{}, _meta, kvs} = node, acc ->
+                kvs = with([{:|, _meta, [_map, inner_kvs]}] <- kvs, do: inner_kvs)
+
+                acc =
+                  for {name, meta, ctx} when is_atom(ctx) <- kvs,
+                      into: acc,
+                      do: {meta[:line], meta[:column], name}
+
+                {node, acc}
+
+              node, acc ->
+                {node, acc}
             end)
 
-          # Expands a given identifier in the mapped_tokens, returning updated mapped_tokens
-          expand_identifier = fn mapped_tokens, {identifier, meta, _ctx} ->
-            Map.update!(mapped_tokens, {meta[:line], meta[:column]}, fn tokens ->
-              Enum.flat_map(tokens, fn token ->
-                with {:identifier, _, ^identifier} <- token do
-                  kw_token = put_elem(token, 0, :kw_identifier)
-                  [kw_token, token]
+          es6_maps_do_expand_identifiers(tokens, idents_to_expand)
+        end
+
+        defp es6_maps_do_expand_identifiers(tokens, idents_to_expand) do
+          tokens
+          |> Enum.reduce([], fn
+            {:identifier, {line, col, _} = loc, name} = token, acc ->
+              if {line, col, name} in idents_to_expand,
+                do: [token, {:kw_identifier, loc, name} | acc],
+                else: [token | acc]
+
+            token, acc when is_tuple(token) ->
+              expanded_token =
+                for idx <- 1..(tuple_size(token) - 1), elem = elem(token, idx), reduce: token do
+                  token when is_list(elem) ->
+                    expanded = es6_maps_do_expand_identifiers(elem, idents_to_expand)
+                    put_elem(token, idx, expanded)
+
+                  token ->
+                    token
                 end
-              end)
-            end)
-          end
 
-          {_, mapped_tokens} =
-            Macro.prewalk(quoted, mapped_tokens, fn
-              {:%{}, _meta, args} = node, mapped_tokens ->
-                kvs = with [{:|, _meta, [_map, inner_kvs]}] <- args, do: inner_kvs
+              [expanded_token | acc]
 
-                mapped_tokens =
-                  for {_name, _meta, ctx} = node <- kvs, is_atom(ctx), reduce: mapped_tokens do
-                    mapped_tokens -> expand_identifier.(mapped_tokens, node)
-                  end
-
-                {node, mapped_tokens}
-
-              node, mapped_tokens ->
-                {node, mapped_tokens}
-            end)
-
-          mapped_tokens
-          |> Enum.sort_by(fn {location, _tokens} -> location end)
-          |> Enum.flat_map(fn {_location, tokens} -> tokens end)
+            token, acc ->
+              [token | acc]
+          end)
+          |> Enum.reverse()
         end
 
         defp string_to_tokens_orig(_string, _line, _column, _file, _opts), do: []
@@ -121,6 +125,12 @@ defmodule Es6Maps do
 
     bytecode
     |> abstract_code()
-    |> Enum.filter(&function?(&1, string_to_tokens: 5, es6_maps_expand_identifiers: 2))
+    |> Enum.filter(
+      &function?(&1,
+        string_to_tokens: 5,
+        es6_maps_expand_identifiers: 2,
+        es6_maps_do_expand_identifiers: 2
+      )
+    )
   end
 end
