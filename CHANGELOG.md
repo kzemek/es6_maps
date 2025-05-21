@@ -30,3 +30,10 @@ Simply remove the `runtime: false` parameter from the dependency definition in `
 -      {:es6_maps, "~> 0.2", runtime: false}
 +      {:es6_maps, "~> 1.0"}
 ```
+
+### ElixirLS plugin
+
+`es6_maps` now includes a plugin for ElixirLS that will ensure it's loaded in the language server.
+
+This feature builds on top of both the base implementation change & runtime instrumentation.
+ElixirLS will see and analyze the expanded code.
