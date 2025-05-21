@@ -19,3 +19,14 @@ assert %MyStruct{hello, foo: 1} = %MyStruct{foo: 10}
 ```
 
 Now, it displays a proper diff as ExUnit's code sees the expanded version.
+
+### Runtime instrumentation
+
+`es6_maps` now includes an `Application` implementation that will enable its functionality in runtime.
+
+Simply remove the `runtime: false` parameter from the dependency definition in `Mix.exs` to enable hot-loading es6-style maps in production:
+
+```diff
+-      {:es6_maps, "~> 0.2", runtime: false}
++      {:es6_maps, "~> 1.0"}
+```
