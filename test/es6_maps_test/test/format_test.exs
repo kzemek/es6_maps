@@ -18,6 +18,26 @@ defmodule Es6MapsTest.Format do
       end
       """
 
+    test_formatting "already formatted map is not reformatted",
+      original: """
+      def test(var) do
+        %{grepme, b, c: 1} = var
+        var
+      end
+      """,
+      formatted: """
+      def test(var) do
+        %{grepme, b, c: 1} = var
+        var
+      end
+      """,
+      reverted: """
+      def test(var) do
+        %{grepme: grepme, b: b, c: 1} = var
+        var
+      end
+      """
+
     test_formatting "has its keys moved to the front when reformatting to shorthand",
       original: """
       def test(var) do

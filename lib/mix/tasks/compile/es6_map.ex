@@ -4,21 +4,26 @@ defmodule Mix.Tasks.Compile.Es6Maps do
   use Mix.Task.Compiler
 
   def run(_args) do
-    {:elixir_map, elixir_map_bytecode, elixir_map_filename} = :code.get_object_code(:elixir_map)
-    elixir_map_forms = abstract_code(elixir_map_bytecode)
-    compile_opts = compile_opts(elixir_map_bytecode)
+    {:elixir, elixir_bytecode, elixir_filename} = :code.get_object_code(:elixir)
+    elixir_forms = abstract_code(elixir_bytecode)
+    compile_opts = compile_opts(elixir_bytecode)
     injected_forms = injected_forms()
 
-    {forms_start, [expand_map_forms | forms_end]} =
-      Enum.split_while(elixir_map_forms, &(not function?(&1, expand_map: 4)))
+    {forms_start, forms_end} =
+      Enum.split_while(elixir_forms, &(not function?(&1, string_to_tokens: 5)))
 
-    expand_map_orig_forms = rename_function(expand_map_forms, :es6_maps_expand_map_orig)
-    forms = Enum.concat([forms_start, injected_forms, [expand_map_orig_forms], forms_end])
+    {string_to_tokens_forms, forms_end} =
+      Enum.split_while(forms_end, &function?(&1, string_to_tokens: 5))
 
-    {:ok, :elixir_map, binary, _warnings} =
+    string_to_tokens_orig_forms =
+      Enum.map(string_to_tokens_forms, &rename_function(&1, :string_to_tokens_orig))
+
+    forms = Enum.concat([forms_start, injected_forms, string_to_tokens_orig_forms, forms_end])
+
+    {:ok, :elixir, binary, _warnings} =
       :compile.forms(forms, [:return_errors, :return_warnings | compile_opts])
 
-    {:module, :elixir_map} = :code.load_binary(:elixir_map, elixir_map_filename, binary)
+    {:module, :elixir} = :code.load_binary(:elixir, elixir_filename, binary)
 
     :ok
   end
@@ -43,22 +48,66 @@ defmodule Mix.Tasks.Compile.Es6Maps do
   defp injected_forms do
     {:module, _, bytecode, _} =
       defmodule Es6Map.InjectedCode do
-        def expand_map(meta, args, s, e),
-          do: es6_maps_expand_map_orig(meta, expand_atom_keys(args), s, e)
+        def string_to_tokens(string, line, column, file, opts) do
+          {enabled?, opts} = Keyword.pop(opts, :es6_maps, true)
 
-        defp expand_atom_keys(args) do
-          Enum.map(args, fn
-            {:|, meta, [map, inner_args]} -> {:|, meta, [map, expand_atom_keys(inner_args)]}
-            {k, _meta, ctx} = v when is_atom(ctx) -> {k, v}
-            other -> other
-          end)
+          with {:ok, tokens} <- string_to_tokens_orig(string, line, column, file, opts) do
+            with true <- enabled?,
+                 opts = Keyword.put(opts, :columns, true),
+                 {:ok, quoted} <- :elixir.tokens_to_quoted(tokens, file, opts),
+                 do: {:ok, es6_maps_expand_identifiers(tokens, quoted)},
+                 else: (_ -> {:ok, tokens})
+          end
         end
 
-        defp es6_maps_expand_map_orig(_meta, _args, _s, _e), do: nil
+        defp es6_maps_expand_identifiers(tokens, quoted) do
+          # A map of {line, column} -> [tokens]
+          mapped_tokens =
+            Enum.group_by(tokens, fn token ->
+              meta = elem(token, 1)
+              line = elem(meta, 0)
+              column = elem(meta, 1)
+              {line, column}
+            end)
+
+          # Expands a given identifier in the mapped_tokens, returning updated mapped_tokens
+          expand_identifier = fn mapped_tokens, {identifier, meta, _ctx} ->
+            Map.update!(mapped_tokens, {meta[:line], meta[:column]}, fn tokens ->
+              Enum.flat_map(tokens, fn token ->
+                with {:identifier, _, ^identifier} <- token do
+                  kw_token = put_elem(token, 0, :kw_identifier)
+                  [kw_token, token]
+                end
+              end)
+            end)
+          end
+
+          {_, mapped_tokens} =
+            Macro.prewalk(quoted, mapped_tokens, fn
+              {:%{}, _meta, args} = node, mapped_tokens ->
+                kvs = with [{:|, _meta, [_map, inner_kvs]}] <- args, do: inner_kvs
+
+                mapped_tokens =
+                  for {_name, _meta, ctx} = node <- kvs, is_atom(ctx), reduce: mapped_tokens do
+                    mapped_tokens -> expand_identifier.(mapped_tokens, node)
+                  end
+
+                {node, mapped_tokens}
+
+              node, mapped_tokens ->
+                {node, mapped_tokens}
+            end)
+
+          mapped_tokens
+          |> Enum.sort_by(fn {location, _tokens} -> location end)
+          |> Enum.flat_map(fn {_location, tokens} -> tokens end)
+        end
+
+        defp string_to_tokens_orig(_string, _line, _column, _file, _opts), do: []
       end
 
     bytecode
     |> abstract_code()
-    |> Enum.filter(&function?(&1, expand_map: 4, expand_atom_keys: 1))
+    |> Enum.filter(&function?(&1, string_to_tokens: 5, es6_maps_expand_identifiers: 2))
   end
 end
