@@ -18,6 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Set up Elixir
         uses: erlef/setup-beam@v1
@@ -39,7 +41,7 @@ jobs:
         run: |
           sed -i 's/version: ".*"/version: "${{ steps.set-version.outputs.version }}"/' mix.exs
           sed -i 's/:es6_maps, "~> .*"/:es6_maps, "~> ${{ steps.set-version.outputs.version }}"/' README.md
-          sed -i 's/^# .* \(Unreleased\)/# ${{ steps.set-version.outputs.version }}/' CHANGELOG.md
+          sed -i 's/^# .*Unreleased.*$/# ${{ steps.set-version.outputs.version }}/' CHANGELOG.md
           git config --global user.name 'Konrad Zemek'
           git config --global user.email 'kzemek@users.noreply.github.com'
           git add mix.exs README.md CHANGELOG.md
