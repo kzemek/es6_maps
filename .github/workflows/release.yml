@@ -1,4 +1,4 @@
-name: release
+name: Release
 
 on:
   release:
@@ -9,8 +9,8 @@ permissions:
   packages: write
 
 env:
-  ELIXIR_VERSION: "1.16.2"
-  ERLANG_VERSION: "26.2"
+  ELIXIR_VERSION: "1.18.4"
+  ERLANG_VERSION: "27.3.4"
 
 jobs:
   build:
@@ -27,6 +27,29 @@ jobs:
 
       - name: Get deps
         run: mix deps.get
+
+      - id: set-version
+        name: Set version variable
+        run: |
+          VSN="${{ github.event.release.tag_name }}"
+          VSN="${VSN#v}"
+          echo "version=${VSN}" >> $GITHUB_OUTPUT
+
+      - name: Update version in mix.exs, README.md and CHANGELOG.md
+        run: |
+          sed -i 's/version: ".*"/version: "${{ steps.set-version.outputs.version }}"/' mix.exs
+          sed -i 's/:es6_maps, "~> .*"/:es6_maps, "~> ${{ steps.set-version.outputs.version }}"/' README.md
+          sed -i 's/^# .* \(Unreleased\)/# ${{ steps.set-version.outputs.version }}/' CHANGELOG.md
+          git config --global user.name 'Konrad Zemek'
+          git config --global user.email 'kzemek@users.noreply.github.com'
+          git add mix.exs README.md CHANGELOG.md
+          git commit -m "Release ${{ github.event.release.tag_name }}"
+          git push
+
+      - name: Retag release
+        run: |
+          git tag -f ${{ github.event.release.tag_name }} HEAD
+          git push -f origin ${{ github.event.release.tag_name }}
 
       - name: Release to hex.pm
         run: mix hex.publish --yes

@@ -1,4 +1,5 @@
 defmodule Es6MapsTest.Support.FormattingAssertions do
+  @moduledoc false
   defmacro test_formatting(name, opts) do
     quote location: :keep do
       test unquote(name) do

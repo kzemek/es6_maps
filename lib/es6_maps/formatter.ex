@@ -60,8 +60,6 @@ defmodule Es6Maps.Formatter do
   @impl Mix.Tasks.Format
   def features(_opts), do: [sigils: [], extensions: [".ex", ".exs"]]
 
-  def format(contents), do: format(contents, [])
-
   @impl Mix.Tasks.Format
   def format(contents, opts) do
     line_length = Keyword.get(opts, :line_length, 98)

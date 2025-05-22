@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+env:
+  MIX_ENV: test
+  ELIXIR_VERSION: "1.18.4"
+  ERLANG_VERSION: "27.3.4"
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: ${{ env.ELIXIR_VERSION }}
+          otp-version: ${{ env.ERLANG_VERSION }}
+
+      - name: Restore dependencies cache
+        uses: actions/cache@v4
+        with:
+          path: deps
+          key: deps-${{ runner.os }}-elixir-${{ env.ELIXIR_VERSION }}-erlang-${{ env.ERLANG_VERSION }}-mixlock-${{ hashFiles('**/mix.lock') }}
+
+      - name: Restore Dialyzer cache
+        uses: actions/cache@v4
+        with:
+          path: _build/${{ env.MIX_ENV }}/dialyxir_*
+          key: dialyzer-${{ runner.os }}-elixir-${{ env.ELIXIR_VERSION }}-erlang-${{ env.ERLANG_VERSION }}
+
+      - name: Install dependencies
+        run: mix deps.get
+
+      - name: Compile
+        run: mix compile
+
+      - name: Credo
+        run: mix credo
+
+      - name: Dialyzer
+        run: mix dialyzer
+
+      - name: Test
+        run: mix test

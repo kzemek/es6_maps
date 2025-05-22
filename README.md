@@ -1,6 +1,6 @@
 # es6_maps
 
-[![CI](https://github.com/kzemek/es6_maps/actions/workflows/elixir.yml/badge.svg)](https://github.com/kzemek/es6_maps/actions/workflows/elixir.yml)
+[![CI](https://github.com/kzemek/es6_maps/actions/workflows/ci.yml/badge.svg)](https://github.com/kzemek/es6_maps/actions/workflows/ci.yml)
 [![Module Version](https://img.shields.io/hexpm/v/es6_maps.svg)](https://hex.pm/packages/es6_maps)
 [![Hex Docs](https://img.shields.io/badge/hex-docs-lightgreen.svg)](https://hexdocs.pm/es6_maps/)
 [![License](https://img.shields.io/hexpm/l/es6_maps.svg)](https://github.com/kzemek/es6_maps/blob/master/LICENSE)
@@ -14,6 +14,15 @@ This often results in repetitive code patterns such as `ctx = %{variable: variab
 
 I believe that introducing a shorthand form of object creation to Elixir enhances the language's ergonomics and is a natural extension of its existing map literals syntax.
 This feature will be immediately familiar to JavaScript and Rust developers, and similar shorthands are present in other languages such as Go.
+
+### Can I easily revert if I don't like it?
+
+Sure! Just add this to `.formatter.exs` and `mix format` your codebase:
+
+```elixir
+plugins: [Es6Maps.Formatter]
+es6_maps: [map_style: :vanilla]
+```
 
 ### Is there any runtime overhead?
 
@@ -111,20 +120,6 @@ The plugin manipulates the AST, not raw strings, so it's precise and will only c
 2. reordering map keys so the shorthand form comes first;
 3. formatting the results like `mix format` would.
 
-### Reverting to the vanilla-style maps
-
-The formatting plugin can also be used to revert all of the ES6-style map shorthand uses back to the "vanilla" style.
-Set the `es6_maps: [map_style: :vanilla]` option in `.formatter.exs`, then call `mix format` to reformat your code:
-
-```elixir
-# .formatter.exs
-[
-  plugins: [Es6Maps.Formatter],
-  inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"],
-  es6_maps: [map_style: :vanilla]
-]
-```
-
 ### Formatting pragmas
 
 The plugin supports pragmas in the comments to control the formatting.
@@ -152,3 +147,5 @@ After `es6_maps` runs as one of the Mix compilers, the Elixir compiler will use 
 >
 > By the nature of this solution it's tightly coupled to the internal Elixir implementation.
 > The current version of `es6_maps` should work for Elixir 1.15, 1.16, 1.17, 1.18 and the upcoming 1.19 version, but may break in the future.
+>
+> That said, starting with version 1.0.0 `es6_maps` instruments a very stable API that's unlikely to change.

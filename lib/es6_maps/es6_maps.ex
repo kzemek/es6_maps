@@ -1,11 +1,26 @@
 defmodule Es6Maps do
+  @external_resource "README.md"
+  @moduledoc File.read!("README.md")
+             |> String.replace(~r/^.*?(?=Enables ES6-like shorthand usage of Elixir maps)/s, "")
+             |> String.replace("> [!WARNING]", "> #### Warning {: .warning}")
+             |> String.replace("> [!IMPORTANT]", "> #### Important {: .info}")
+
   use Application
 
+  @doc """
+  Callback implementation for `Application.start/2`.  Calls `load/0`.
+  """
+  @impl Application
+  @spec start(Application.start_type(), term()) :: Supervisor.on_start()
   def start(_type, _args) do
     load()
     Supervisor.start_link([], name: __MODULE__, strategy: :one_for_one)
   end
 
+  @doc """
+  Injects the ES6 maps support into the Elixir compiler.
+  """
+  @spec load() :: :ok
   def load do
     if not injected?(), do: inject_es6_maps_support()
     :ok
@@ -60,7 +75,10 @@ defmodule Es6Maps do
 
   defp injected_forms do
     {:module, _, bytecode, _} =
-      defmodule Es6Map.InjectedCode do
+      defmodule Es6Maps.InjectedCode do
+        @moduledoc false
+
+        # credo:disable-for-next-line
         def string_to_tokens(string, line, column, file, opts) do
           {enabled?, opts} = Keyword.pop(opts, :es6_maps, true)
 

@@ -1,5 +1,5 @@
 defmodule Es6MapsTest.Format do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   import Es6MapsTest.Support.FormattingAssertions
 

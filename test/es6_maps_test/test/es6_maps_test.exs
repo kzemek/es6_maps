@@ -1,10 +1,7 @@
 defmodule Es6MapsTest.Es6Maps do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
-  defmodule MyStruct do
-    @moduledoc false
-    defstruct [:hello, :foo, :bar]
-  end
+  alias Es6MapsTest.Support.MyStruct
 
   doctest_file("../../README.md")
 
@@ -129,10 +126,10 @@ defmodule Es6MapsTest.Es6Maps do
       _ = hello
     rescue
       e in ExUnit.AssertionError ->
-        assert Macro.to_string(e.left) == "%Es6MapsTest.Es6Maps.MyStruct{hello: hello, foo: 2}"
+        assert Macro.to_string(e.left) == "%Es6MapsTest.Support.MyStruct{hello: hello, foo: 2}"
 
         assert Macro.to_string(e.right) ==
-                 "%Es6MapsTest.Es6Maps.MyStruct{hello: nil, foo: 1, bar: 3}"
+                 "%Es6MapsTest.Support.MyStruct{hello: nil, foo: 1, bar: 3}"
     end
 
     test "assert maps" do
