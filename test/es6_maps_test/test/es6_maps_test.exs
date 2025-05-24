@@ -122,7 +122,7 @@ defmodule Es6MapsTest.Es6Maps do
   describe "ExUnit assertions" do
     test "assert structs" do
       foo = 1
-      assert %MyStruct{hello: hello, foo: 2} = %MyStruct{foo: foo, bar: 3}
+      assert %MyStruct{hello, foo: 2} = %MyStruct{foo, bar: 3}
       _ = hello
     rescue
       e in ExUnit.AssertionError ->
@@ -134,7 +134,7 @@ defmodule Es6MapsTest.Es6Maps do
 
     test "assert maps" do
       foo = 1
-      assert %{hello: hello, foo: 2} = %{foo: foo, bar: 3}
+      assert %{hello, foo: 2} = %{foo, bar: 3}
       _ = hello
     rescue
       e in ExUnit.AssertionError ->
