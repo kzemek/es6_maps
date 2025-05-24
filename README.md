@@ -20,8 +20,12 @@ This feature will be immediately familiar to JavaScript and Rust developers, and
 Sure! Just add this to `.formatter.exs` and `mix format` your codebase:
 
 ```elixir
-plugins: [Es6Maps.Formatter]
-es6_maps: [map_style: :vanilla]
+# .formatter.exs
+[
+  plugins: [Es6Maps.Formatter],
+  es6_maps: [map_style: :vanilla],
+  # ...
+]
 ```
 
 ### Is there any runtime overhead?
