@@ -7,6 +7,12 @@
 
 Enables ES6-like shorthand usage of Elixir maps.
 
+```elixir
+iex> %{foo} = %{foo: 1, bar: 2}
+iex> foo
+1
+```
+
 ### Why?
 
 When writing code that heavily utilizes structures and passes complex objects through multiple layers, it's common to frequently use map literals.
