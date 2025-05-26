@@ -8,7 +8,7 @@
 
 `es6_maps` now instruments `:elixir.string_to_tokens/5` instead of `:elixir_map.expand_map/4`.
 
-This is a much less internal API, making it unlikely to break `es6_maps` in the future.  
+This is a much less internal API, making it unlikely to break `es6_maps` in the future.
 It also plays much better with the broader Elixir ecosystem that's likely to read Elixir code via the tokenizer.
 In particular, anything that reads AST will see the "expanded"/"vanilla" map syntax.
 
@@ -37,3 +37,12 @@ Simply remove the `runtime: false` parameter from the dependency definition in `
 
 This feature builds on top of both the base implementation change & runtime instrumentation.
 ElixirLS will see and analyze the expanded code.
+
+## 1.0.1
+
+### Features
+
+- Pre-prepare the injected `:elixir` bytecode on compile
+
+  In releases and other environments with stripped beam files, we don't have access to `:abstract_code` chunk of the `:elixir` module.
+  Pre-preparing bytecode on compile allows us to load `es6_maps` in these runtime environments.
