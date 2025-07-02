@@ -38,6 +38,15 @@ Simply remove the `runtime: false` parameter from the dependency definition in `
 This feature builds on top of both the base implementation change & runtime instrumentation.
 ElixirLS will see and analyze the expanded code.
 
+## 1.0.2 (Unreleased)
+
+### Features
+
+- Split bytecode injection code to a separate package [`beam_patch`](https://github.com/kzemek/beam_patch)
+
+  The bytecode injection functionality of `es6_maps` is useful for other projects as well.
+  [`beam_patch`](https://github.com/kzemek/beam_patch) is already a more advanced and robust version than the original `es6_maps` code.
+
 ## 1.0.1
 
 ### Features

@@ -37,6 +37,6 @@ defmodule Es6Maps do
 
   defp inject_es6_maps_support do
     elixir_filename = :code.which(:elixir)
-    {:module, :elixir} = :code.load_binary(:elixir, elixir_filename, @elixir_bytecode)
+    BeamPatch.load!(%{@elixir_bytecode | filename: elixir_filename})
   end
 end
