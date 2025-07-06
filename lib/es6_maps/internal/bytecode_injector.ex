@@ -6,11 +6,12 @@ defmodule Es6Maps.Internal.BytecodeInjector do
   @spec prepare_bytecode() :: BeamPatch.Patch.t()
   def prepare_bytecode do
     BeamPatch.patch! :elixir do
+      @override original: [rename_to: :string_to_tokens_orig]
       # credo:disable-for-next-line Credo.Check.Readability.Specs
       def string_to_tokens(string, line, column, file, opts) do
         {enabled?, opts} = Keyword.pop(opts, :es6_maps, true)
 
-        with {:ok, tokens} <- super(string, line, column, file, opts) do
+        with {:ok, tokens} <- string_to_tokens_orig(string, line, column, file, opts) do
           with true <- enabled?,
                opts = Keyword.put(opts, :columns, true),
                {:ok, quoted} <- :elixir.tokens_to_quoted(tokens, file, opts),
