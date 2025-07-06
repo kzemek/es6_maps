@@ -19,22 +19,22 @@ jobs:
     name: Build and test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Set up Elixir
-        uses: erlef/setup-beam@v1
+        uses: erlef/setup-beam@8e7fdef09ffa3ea54328b5000c170a3b9b20ca96 # v1.20.3
         with:
           elixir-version: ${{ env.ELIXIR_VERSION }}
           otp-version: ${{ env.ERLANG_VERSION }}
 
       - name: Restore dependencies cache
-        uses: actions/cache@v4
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
         with:
           path: deps
           key: deps-${{ runner.os }}-elixir-${{ env.ELIXIR_VERSION }}-erlang-${{ env.ERLANG_VERSION }}-mixlock-${{ hashFiles('**/mix.lock') }}
 
       - name: Restore Dialyzer cache
-        uses: actions/cache@v4
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
         with:
           path: _build/${{ env.MIX_ENV }}/dialyxir_*
           key: dialyzer-${{ runner.os }}-elixir-${{ env.ELIXIR_VERSION }}-erlang-${{ env.ERLANG_VERSION }}
