@@ -103,7 +103,7 @@ iex> %MyStruct{foo, bar, hello: "world"}
 
 iex> struct = %MyStruct{foo: 1, bar: 2}
 iex> hello = "world"
-iex> %MyStruct{struct | hello}
+iex> %{struct | hello}
 %MyStruct{foo: 1, bar: 2, hello: "world"}
 
 iex> %MyStruct{hello} = %MyStruct{hello: "world", foo: 1}

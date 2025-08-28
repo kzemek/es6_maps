@@ -63,8 +63,8 @@ defmodule Es6Maps.MixProject do
   end
 
   defp test(args) do
-    args = if :prim_tty.isatty(:stdout), do: ["--color" | args], else: args
-    args = ~w[--cd test/es6_maps_test MIX_ENV=test mix do deps.get + test] ++ args
-    Mix.Task.run("cmd", args)
+    color = if :prim_tty.isatty(:stdout), do: ["--color"], else: []
+    args = ~w[do deps.get + test] ++ color ++ args
+    Mix.Shell.IO.cmd({"mix", args}, cd: "test/es6_maps_test", env: %{"MIX_ENV" => "test"})
   end
 end
