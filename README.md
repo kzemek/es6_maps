@@ -156,6 +156,6 @@ After `es6_maps` runs as one of the Mix compilers, the Elixir compiler will use 
 > [!IMPORTANT]
 >
 > By the nature of this solution it's tightly coupled to the internal Elixir implementation.
-> The current version of `es6_maps` should work for Elixir 1.15, 1.16, 1.17, 1.18 and the upcoming 1.19 version, but may break in the future.
+> The current version of `es6_maps` should work for Elixir 1.15, 1.16, 1.17, 1.18, 1.19 and the upcoming 1.20 version, but may break in the future.
 >
 > That said, starting with version 1.0.0 `es6_maps` instruments a very stable API that's unlikely to change.
