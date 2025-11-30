@@ -38,7 +38,7 @@ Simply remove the `runtime: false` parameter from the dependency definition in `
 This feature builds on top of both the base implementation change & runtime instrumentation.
 ElixirLS will see and analyze the expanded code.
 
-## 1.0.2 (Unreleased)
+## 1.0.2
 
 ### Features
 
