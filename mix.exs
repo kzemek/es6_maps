@@ -24,7 +24,7 @@ defmodule Es6Maps.MixProject do
   defp deps do
     [
       {:beam_patch, "~> 0.2.2"},
-      {:ex_doc, "~> 0.39.1", only: :dev, runtime: false, optional: true},
+      {:ex_doc, "~> 0.40.0", only: :dev, runtime: false, optional: true},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false, optional: true},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false, optional: true}
     ]
