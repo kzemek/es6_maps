@@ -1,5 +1,5 @@
 %{
-  "beam_patch": {:hex, :beam_patch, "0.2.2", "df8151e8d82af46a76bed28a6a66ebbdea43a34a13edeb0ee77b613fbab9a75a", [:mix], [], "hexpm", "0be5dca6f8e5da7733463b843cdd572e87f7cafa5eeb73bc895f4b9f33cdd672"},
+  "beam_patch": {:hex, :beam_patch, "0.2.3", "92d3f61d64649fbd492e4337cb5795d2852f984e017a0cb4e24415a43ad5fc53", [:mix], [], "hexpm", "f9bdbbb552f0a83e92fab69e5fbf613f01f3c2d449488b467dc2eddf5799f911"},
   "bunt": {:hex, :bunt, "1.0.0", "081c2c665f086849e6d57900292b3a161727ab40431219529f13c4ddcf3e7a44", [:mix], [], "hexpm", "dc5f86aa08a5f6fa6b8096f0735c4e76d54ae5c9fa2c143e5a1fc7c1cd9bb6b5"},
   "credo": {:hex, :credo, "1.7.16", "a9f1389d13d19c631cb123c77a813dbf16449a2aebf602f590defa08953309d4", [:mix], [{:bunt, "~> 0.2.1 or ~> 1.0", [hex: :bunt, repo: "hexpm", optional: false]}, {:file_system, "~> 0.2 or ~> 1.0", [hex: :file_system, repo: "hexpm", optional: false]}, {:jason, "~> 1.0", [hex: :jason, repo: "hexpm", optional: false]}], "hexpm", "d0562af33756b21f248f066a9119e3890722031b6d199f22e3cf95550e4f1579"},
   "dialyxir": {:hex, :dialyxir, "1.4.7", "dda948fcee52962e4b6c5b4b16b2d8fa7d50d8645bbae8b8685c3f9ecb7f5f4d", [:mix], [{:erlex, ">= 0.2.8", [hex: :erlex, repo: "hexpm", optional: false]}], "hexpm", "b34527202e6eb8cee198efec110996c25c5898f43a4094df157f8d28f27d9efe"},
