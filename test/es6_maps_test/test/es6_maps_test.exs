@@ -5,9 +5,9 @@ defmodule Es6MapsTest.Es6Maps do
 
   doctest_file("../../README.md")
 
-  describe ":elixir.string_to_tokens/5" do
+  describe "string_to_tokens/5" do
     test "map expand" do
-      assert {:ok, tokens} = :elixir.string_to_tokens(~c"%{x}", 0, 0, "", [])
+      assert {:ok, tokens} = string_to_tokens(~c"%{x}", 0, 0, "", [])
 
       assert [
                {:%{}, _},
@@ -19,7 +19,7 @@ defmodule Es6MapsTest.Es6Maps do
     end
 
     test "map failure to expand when `es6_maps: false`" do
-      assert {:ok, tokens} = :elixir.string_to_tokens(~c"%{x}", 0, 0, "", es6_maps: false)
+      assert {:ok, tokens} = string_to_tokens(~c"%{x}", 0, 0, "", es6_maps: false)
 
       assert [
                {:%{}, _},
@@ -30,7 +30,7 @@ defmodule Es6MapsTest.Es6Maps do
     end
 
     test "struct expand" do
-      assert {:ok, tokens} = :elixir.string_to_tokens(~c"%S{x}", 0, 0, "", [])
+      assert {:ok, tokens} = string_to_tokens(~c"%S{x}", 0, 0, "", [])
 
       assert [
                {:%, _},
@@ -43,7 +43,7 @@ defmodule Es6MapsTest.Es6Maps do
     end
 
     test "struct failure to expand when `es6_maps: false`" do
-      assert {:ok, tokens} = :elixir.string_to_tokens(~c"%S{x}", 0, 0, "", es6_maps: false)
+      assert {:ok, tokens} = string_to_tokens(~c"%S{x}", 0, 0, "", es6_maps: false)
 
       assert [
                {:%, _},
@@ -55,7 +55,7 @@ defmodule Es6MapsTest.Es6Maps do
     end
 
     test "map expand in binary" do
-      assert {:ok, tokens} = :elixir.string_to_tokens(~C'"#{%{x}}"', 0, 0, "", [])
+      assert {:ok, tokens} = string_to_tokens(~C'"#{%{x}}"', 0, 0, "", [])
 
       assert [
                {:bin_string, _,
@@ -79,7 +79,7 @@ defmodule Es6MapsTest.Es6Maps do
       """
       '''
 
-      assert {:ok, tokens} = :elixir.string_to_tokens(code, 0, 0, "", [])
+      assert {:ok, tokens} = string_to_tokens(code, 0, 0, "", [])
 
       assert [
                {:bin_heredoc, _, _,
@@ -101,7 +101,7 @@ defmodule Es6MapsTest.Es6Maps do
 
     test "map expand in sigil" do
       assert {:ok, tokens} =
-               :elixir.string_to_tokens(~C"~w[#{%{x}}]", 0, 0, "", [])
+               string_to_tokens(~C"~w[#{%{x}}]", 0, 0, "", [])
 
       assert [
                {:sigil, _, _,
@@ -140,6 +140,14 @@ defmodule Es6MapsTest.Es6Maps do
       e in ExUnit.AssertionError ->
         assert Macro.to_string(e.left) == "%{hello: hello, foo: 2}"
         assert Macro.to_string(e.right) == "%{foo: 1, bar: 3}"
+    end
+  end
+
+  defp string_to_tokens(string, line, column, file, opts) do
+    case :elixir.string_to_tokens(string, line, column, file, opts) do
+      {:ok, tokens} -> {:ok, tokens}
+      {:ok, tokens, _warnings} -> {:ok, tokens}
+      {:error, reason} -> {:error, reason}
     end
   end
 end

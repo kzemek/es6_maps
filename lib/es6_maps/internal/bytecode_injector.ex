@@ -11,12 +11,24 @@ defmodule Es6Maps.Internal.BytecodeInjector do
       def string_to_tokens(string, line, column, file, opts) do
         {enabled?, opts} = Keyword.pop(opts, :es6_maps, true)
 
-        with {:ok, tokens} <- string_to_tokens_orig(string, line, column, file, opts) do
+        # Elixir <=1.19 return {:ok, tokens}; >1.20 return {:ok, tokens, warnings}
+        with orig_result when elem(orig_result, 0) == :ok <-
+               string_to_tokens_orig(string, line, column, file, opts) do
+          tokens = elem(orig_result, 1)
+
           with true <- enabled?,
                opts = Keyword.put(opts, :columns, true),
-               {:ok, quoted} <- :elixir.tokens_to_quoted(tokens, file, opts),
-               do: {:ok, es6_maps_expand_identifiers(tokens, quoted)},
-               else: (_ -> {:ok, tokens})
+               {:ok, quoted} <- es6_maps_tokens_to_quoted(tokens, file, opts),
+               do: put_elem(orig_result, 1, es6_maps_expand_identifiers(tokens, quoted)),
+               else: (_ -> orig_result)
+        end
+      end
+
+      defp es6_maps_tokens_to_quoted(tokens, file, opts) do
+        case :elixir.tokens_to_quoted(tokens, file, opts) do
+          {:ok, quoted} -> {:ok, quoted}
+          {:ok, quoted, _warnings} -> {:ok, quoted}
+          {:error, reason} -> {:error, reason}
         end
       end
 

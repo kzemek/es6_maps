@@ -11,8 +11,8 @@ permissions:
 
 env:
   MIX_ENV: test
-  ELIXIR_VERSION: "1.18.4"
-  ERLANG_VERSION: "27.3.4"
+  ELIXIR_VERSION: "1.20.1"
+  ERLANG_VERSION: "29.0.2"
 
 jobs:
   build:
