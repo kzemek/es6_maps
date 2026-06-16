@@ -3,6 +3,7 @@ defmodule Es6Maps.Internal.BytecodeInjector do
 
   require BeamPatch
 
+  # credo:disable-for-this-file Credo.Check.Refactor.CyclomaticComplexity
   @spec prepare_bytecode() :: BeamPatch.Patch.t()
   def prepare_bytecode do
     BeamPatch.patch! :elixir do
