@@ -120,7 +120,18 @@ Add the plugin to `.formatter.exs`, then call `mix format` to reformat your code
 # .formatter.exs
 [
   plugins: [Es6Maps.Formatter],
-  inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"]
+  inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"],
+
+  # Additional options can be specified under `:es6_maps` key:
+  es6_maps: [
+    # Set the default formatting map style (default: `:es6`).
+    map_style: :vanilla,
+    # Override the options for the matching `inputs`; the first matching rule wins.
+    # (default: `[{["config/runtime.exs"], map_style: :vanilla}]`, always appended last).
+    rules: [
+      {["config/runtime.exs", "lib/**/keep_vanilla.ex"], map_style: :vanilla},
+    ]
+  ],
 ]
 ```
 

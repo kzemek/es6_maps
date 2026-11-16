@@ -7,8 +7,19 @@ defmodule Es6Maps.Formatter do
   ```elixir
   # .formatter.exs
   [
-  plugins: [Es6Maps.Formatter],
-  inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"]
+    plugins: [Es6Maps.Formatter],
+    inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"],
+
+    # Additional options can be specified under `:es6_maps` key:
+    es6_maps: [
+      # Set the default formatting map style (default: `:es6`).
+      map_style: :vanilla,
+      # Override the options for the matching `inputs`; the first matching rule wins
+      # (default: `[{["config/runtime.exs"], map_style: :vanilla}]`, always appended last).
+      rules: [
+        {["config/runtime.exs", "lib/**/keep_vanilla.ex"], map_style: :vanilla},
+      ]
+    ],
   ]
   ```
 
@@ -52,16 +63,28 @@ defmodule Es6Maps.Formatter do
   ## Options
     * `es6_maps`:
       * `map_style` - `:es6` to convert to shorthand form, `:vanilla` to revert to the vanilla-style maps.
+      * `rules` - a list of `{globs, options}` tuples overriding the formatting options for the matching `inputs`.
     * all other options of mix format, such as `line_length`, are supported and passed down to formatting functions.
   """
 
   @behaviour Mix.Tasks.Format
+
+  @default_rules [{["config/runtime.exs"], map_style: :vanilla}]
 
   @impl Mix.Tasks.Format
   def features(_opts), do: [sigils: [], extensions: [".ex", ".exs"]]
 
   @impl Mix.Tasks.Format
   def format(contents, opts) do
+    file = opts[:file] && Path.relative_to_cwd(opts[:file])
+    rules = (opts[:es6_maps][:rules] || []) ++ @default_rules
+
+    es6_maps_opts_overrides =
+      Enum.find_value(rules, [], fn {globs, opts} ->
+        if file && Enum.any?(globs, &(file =~ glob_to_regex(&1))), do: opts
+      end)
+
+    opts = Config.Reader.merge(opts, es6_maps: es6_maps_opts_overrides)
     line_length = Keyword.get(opts, :line_length, 98)
 
     {quoted, comments} =
@@ -88,6 +111,30 @@ defmodule Es6Maps.Formatter do
       [] -> ""
       text -> IO.iodata_to_binary([text, ?\n])
     end
+  end
+
+  @glob_to_regex %{
+    "\\*\\*/" => "(?:[^/]+/)*",
+    "\\*\\*" => ".*",
+    "\\*" => "[^/]*",
+    "\\?" => "[^/]",
+    "\\{" => "(?:",
+    "\\}" => ")",
+    "," => "|",
+    "\\[" => "[",
+    "\\]" => "]",
+    "\\-" => "-"
+  }
+
+  @glob_to_regex_keys Map.keys(@glob_to_regex)
+
+  defp glob_to_regex(glob) do
+    source =
+      glob
+      |> Regex.escape()
+      |> String.replace(@glob_to_regex_keys, &Map.fetch!(@glob_to_regex, &1))
+
+    Regex.compile!("^(?:#{source})$")
   end
 
   defp comments_to_pragmas(comments) do

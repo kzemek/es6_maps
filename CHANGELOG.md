@@ -1,5 +1,30 @@
 # Changelog
 
+# 1.1.0 (Unreleased)
+
+## Highlights
+
+Add `rules` option to `Es6Maps.Formatter` plugin.
+It takes a list of `{[glob], options}` tuples, with file globs like in `Path.wildcard/2`.
+Rules are evaluated top to bottom, and stop at first match; files that don't any rule are formatted with the default options.
+
+```elixir
+# .formatter.exs
+[
+  plugins: [Es6Maps.Formatter],
+  inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"],
+  es6_maps: [
+    rules: [
+      {["config/runtime.exs", "lib/**/keep_vanilla.ex"], map_style: :vanilla},
+    ]
+  ]
+]
+```
+
+The default rules are `[{["config/runtime.exs"], map_style: :vanilla}],
+
+By default, `"config/runtime.exs"` is formatted with `map_style: :vanilla`.
+
 # 1.0.0
 
 ## Highlights

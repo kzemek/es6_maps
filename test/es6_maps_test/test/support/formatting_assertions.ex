@@ -9,7 +9,7 @@ defmodule Es6MapsTest.Support.FormattingAssertions do
         reverted = Keyword.get(opts, :reverted, original)
 
         formatting_opts = Keyword.get(opts, :opts, [])
-        vanilla_opts = Config.Reader.merge(opts, es6_maps: [map_style: :vanilla])
+        vanilla_opts = Config.Reader.merge(formatting_opts, es6_maps: [map_style: :vanilla])
 
         assert Es6Maps.Formatter.format(original, formatting_opts) == formatted
         assert Es6Maps.Formatter.format(formatted, vanilla_opts) == reverted

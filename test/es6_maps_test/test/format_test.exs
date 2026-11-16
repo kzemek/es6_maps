@@ -243,4 +243,92 @@ defmodule Es6MapsTest.Format do
       end
       """
   end
+
+  describe "rules option" do
+    test_formatting "formats a file not matching any rule with the default options",
+      opts: [file: "lib/foo.ex", es6_maps: [rules: [{["test/**/*.exs"], map_style: :vanilla}]]],
+      original: """
+      %{a: a, b: 1} = var
+      """,
+      formatted: """
+      %{a, b: 1} = var
+      """
+
+    test_formatting "formats config/runtime.exs with vanilla-style maps by default",
+      opts: [file: "config/runtime.exs"],
+      original: """
+      %{a, b: 1} = var
+      """,
+      formatted: """
+      %{a: a, b: 1} = var
+      """,
+      reverted: """
+      %{a: a, b: 1} = var
+      """
+
+    test_formatting "formats a file matching a rule with the rule's options",
+      opts: [
+        file: "lib/sub/foo.ex",
+        es6_maps: [
+          rules: [{["test/f[a-z]?.exs", "{lib,config}/**/*.{ex,exs}"], map_style: :vanilla}]
+        ]
+      ],
+      original: """
+      %{a, b: 1} = var
+      """,
+      formatted: """
+      %{a: a, b: 1} = var
+      """,
+      reverted: """
+      %{a: a, b: 1} = var
+      """
+
+    test_formatting "applies the first matching rule",
+      opts: [
+        file: "lib/foo.ex",
+        es6_maps: [
+          rules: [
+            {["lib/*.exs"], map_style: :es6},
+            {["lib/*.ex"], map_style: :vanilla},
+            {["**/*"], map_style: :es6}
+          ]
+        ]
+      ],
+      original: """
+      %{a, b: 1} = var
+      """,
+      formatted: """
+      %{a: a, b: 1} = var
+      """,
+      reverted: """
+      %{a: a, b: 1} = var
+      """
+
+    test_formatting "rule's options override the default options",
+      opts: [
+        file: "lib/foo.ex",
+        es6_maps: [map_style: :vanilla, rules: [{["lib/**"], map_style: :es6}]]
+      ],
+      original: """
+      %{a: a, b: 1} = var
+      """,
+      formatted: """
+      %{a, b: 1} = var
+      """,
+      reverted: """
+      %{a, b: 1} = var
+      """
+
+    test_formatting "keeps the default rules after the configured ones",
+      opts: [file: "config/runtime.exs", es6_maps: [rules: [{["lib/**"], map_style: :es6}]]],
+      original: """
+      %{a, b: 1} = var
+      """,
+      formatted: """
+      %{a: a, b: 1} = var
+      """,
+      reverted: """
+      %{a: a, b: 1} = var
+      """
+  end
 end
