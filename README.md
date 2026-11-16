@@ -54,7 +54,7 @@ end
 
 def deps do
   [
-    {:es6_maps, "~> 1.0.3"}
+    {:es6_maps, "~> 1.1.0"}
   ]
 end
 ```
