@@ -107,9 +107,10 @@ defmodule Es6Maps.Formatter do
     |> Macro.postwalk(&format_map(&1, pragmas, opts))
     |> Code.Formatter.to_algebra(Keyword.merge([comments: comments], opts))
     |> Inspect.Algebra.format(line_length)
+    |> IO.iodata_to_binary()
     |> case do
-      [] -> ""
-      text -> IO.iodata_to_binary([text, ?\n])
+      "" -> ""
+      text -> text <> "\n"
     end
   end
 

@@ -232,6 +232,9 @@ defmodule Es6MapsTest.Format do
       end
       """
 
+    test_formatting "empty file stays empty",
+      original: ""
+
     test_formatting "multiline list literals are not single-lined",
       original: """
       def test do
